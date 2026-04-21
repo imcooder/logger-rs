@@ -1,7 +1,7 @@
-# hourly-file-logger
+# logger-rs
 
-[![Crates.io](https://img.shields.io/crates/v/hourly-file-logger.svg)](https://crates.io/crates/hourly-file-logger)
-[![Docs.rs](https://docs.rs/hourly-file-logger/badge.svg)](https://docs.rs/hourly-file-logger)
+[![Crates.io](https://img.shields.io/crates/v/logger-rs.svg)](https://crates.io/crates/logger-rs)
+[![Docs.rs](https://docs.rs/logger-rs/badge.svg)](https://docs.rs/logger-rs)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 A high-performance, hourly-rotating file logger for Rust that implements the [`log`](https://crates.io/crates/log) facade.
@@ -27,7 +27,7 @@ Add to `Cargo.toml`:
 
 ```toml
 [dependencies]
-hourly-file-logger = "0.1"
+logger-rs = "0.1"
 log = "0.4"
 ```
 
@@ -106,7 +106,7 @@ pub struct Config {
 
 ## Comparison with @imcooder/node-logger
 
-| Feature | node-logger (JS) | hourly-file-logger (Rust) |
+| Feature | node-logger (JS) | logger-rs (Rust) |
 |---------|-----------------|--------------------------|
 | Hourly rotation | ✅ | ✅ |
 | File naming `app.log.YYYYMMDDHH` | ✅ | ✅ |

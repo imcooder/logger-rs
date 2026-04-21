@@ -1,15 +1,16 @@
 [package]
-name = "hourly-file-logger"
+name = "logger-rs"
 version = "0.1.0"
 edition = "2021"
 description = "A high-performance hourly-rotating file logger implementing the `log` facade, with TTL-based cleanup. Behaviorally equivalent to @imcooder/node-logger."
 license = "MIT"
 keywords = ["logging", "rotate", "hourly", "file", "log"]
 categories = ["development-tools::debugging"]
-repository = "https://github.com/cooder-ai/hourly-file-logger"
-homepage = "https://github.com/cooder-ai/hourly-file-logger"
-documentation = "https://docs.rs/hourly-file-logger"
+repository = "https://github.com/imcooder/logger-rs"
+homepage = "https://github.com/imcooder/logger-rs"
+documentation = "https://docs.rs/logger-rs"
 readme = "README.md"
+authors = ["imcooder <imcooder@gmail.com>"]
 
 [dependencies]
 log = "0.4"
