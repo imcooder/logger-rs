@@ -28,7 +28,7 @@ enum Msg {
 ///
 /// # Example
 /// ```rust,no_run
-/// use imcooder_logger::Config;
+/// use logger_rs_nx::Config;
 /// use log::LevelFilter;
 /// use std::path::PathBuf;
 ///
