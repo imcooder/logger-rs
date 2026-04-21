@@ -22,13 +22,13 @@ enum Msg {
 
 // ── Public config ─────────────────────────────────────────────────────────────
 
-/// Configuration for [`HourlyFileLogger`].
+/// Configuration for [`Logger`].
 ///
 /// Mirrors `@imcooder/node-logger` options.
 ///
 /// # Example
 /// ```rust,no_run
-/// use logger_rs::Config;
+/// use imcooder_logger::Config;
 /// use log::LevelFilter;
 /// use std::path::PathBuf;
 ///
@@ -87,7 +87,7 @@ impl Default for Config {
 ///
 /// All file I/O is performed on a dedicated background thread via a lock-free
 /// channel, so calling threads are never blocked.
-pub struct HourlyFileLogger {
+pub struct Logger {
     sender: Sender<Msg>,
     console: bool,
     level: LevelFilter,
@@ -95,7 +95,7 @@ pub struct HourlyFileLogger {
     shutdown_flag: Arc<AtomicBool>,
 }
 
-impl HourlyFileLogger {
+impl Logger {
     /// Create a logger and spawn the background writer thread.
     pub fn new(config: Config) -> Self {
         let log_dir = config.log_dir.clone();
@@ -133,7 +133,7 @@ impl HourlyFileLogger {
     }
 }
 
-impl log::Log for HourlyFileLogger {
+impl log::Log for Logger {
     fn enabled(&self, metadata: &Metadata) -> bool {
         metadata.level() <= self.level
     }

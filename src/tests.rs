@@ -80,7 +80,7 @@ fn writes_log_file_on_init() {
     let dir = TempDir::new().unwrap();
     let log_dir: PathBuf = dir.path().to_path_buf();
 
-    let logger = crate::HourlyFileLogger::new(crate::Config {
+    let logger = crate::Logger::new(crate::Config {
         app_name: "myapp".to_string(),
         log_dir: log_dir.clone(),
         ttl_hours: 72,
@@ -111,7 +111,7 @@ fn debug_messages_below_info_not_written() {
     let dir = TempDir::new().unwrap();
     let log_dir = dir.path().to_path_buf();
 
-    let logger = crate::HourlyFileLogger::new(crate::Config {
+    let logger = crate::Logger::new(crate::Config {
         app_name: "filtertest".to_string(),
         log_dir: log_dir.clone(),
         ttl_hours: 72,

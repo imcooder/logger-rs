@@ -1,6 +1,6 @@
-# logger-rs
+# imcooder-logger
 
-[![Crates.io](https://img.shields.io/crates/v/logger-rs.svg)](https://crates.io/crates/imcooder-logger)
+[![Crates.io](https://img.shields.io/crates/v/imcooder-logger.svg)](https://crates.io/crates/imcooder-logger)
 [![docs.rs](https://docs.rs/imcooder-logger/badge.svg)](https://docs.rs/imcooder-logger)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -28,23 +28,23 @@ Behaviorally equivalent to the Node.js [`@imcooder/node-logger`](https://github.
 
 ```toml
 [dependencies]
-logger-rs = "0.1"
+imcooder-logger = "0.1"
 log = "0.4"
 ```
 
 ## Quick Start
 
 ```rust
-use logger_rs::{Config, init};
+use imcooder_logger::{Config, init};
 use log::LevelFilter;
 use std::path::PathBuf;
 
 fn main() {
     // Option 1: convenience constructor
-    logger_rs::init(logger_rs::config("my-app", "/var/log/my-app")).unwrap();
+    imcooder_logger::init(imcooder_logger::config("my-app", "/var/log/my-app")).unwrap();
 
     // Option 2: full config
-    logger_rs::init(Config {
+    imcooder_logger::init(Config {
         app_name: "my-app".to_string(),
         log_dir:  PathBuf::from("/var/log/my-app"),
         ttl_hours: 72,
@@ -57,7 +57,7 @@ fn main() {
     log::error!("Connection failed: {}", "timeout");
 
     // Flush & stop background thread before exit
-    logger_rs::shutdown();
+    imcooder_logger::shutdown();
 }
 ```
 
@@ -80,7 +80,7 @@ fn main() {
 
 ## Comparison with @imcooder/node-logger
 
-| Feature | `@imcooder/node-logger` | `logger-rs` |
+| Feature | `@imcooder/node-logger` | `imcooder-logger` |
 |---------|------------------------|-------------|
 | Log format | `[time] [LEVEL] app - msg` | `[time] [LEVEL] app - msg` ✅ |
 | File naming | `app.log.YYYYMMDDHH` | `app.log.YYYYMMDDHH` ✅ |

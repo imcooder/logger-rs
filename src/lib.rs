@@ -22,7 +22,7 @@
 //! ## Quick start
 //!
 //! ```rust,no_run
-//! use logger_rs::{Config, init};
+//! use imcooder_logger::{Config, init};
 //! use log::LevelFilter;
 //! use std::path::PathBuf;
 //!
@@ -39,19 +39,19 @@
 //! log::error!("Connection failed: {}", "timeout");
 //!
 //! // Before process exit:
-//! logger_rs::shutdown();
+//! imcooder_logger::shutdown();
 //! ```
 
 mod cleaner;
 mod formatter;
 mod logger;
 
-pub use logger::{Config, HourlyFileLogger};
+pub use logger::{Config, Logger};
 
 use log::SetLoggerError;
 use std::sync::OnceLock;
 
-static LOGGER: OnceLock<HourlyFileLogger> = OnceLock::new();
+static LOGGER: OnceLock<Logger> = OnceLock::new();
 
 /// Initialise the global logger.
 ///
@@ -60,7 +60,7 @@ static LOGGER: OnceLock<HourlyFileLogger> = OnceLock::new();
 ///
 /// # Example
 /// ```rust,no_run
-/// use logger_rs::{Config, init};
+/// use imcooder_logger::{Config, init};
 /// use log::LevelFilter;
 /// use std::path::PathBuf;
 ///
@@ -74,7 +74,7 @@ static LOGGER: OnceLock<HourlyFileLogger> = OnceLock::new();
 /// ```
 pub fn init(config: Config) -> Result<(), SetLoggerError> {
     let level = config.level;
-    let logger = LOGGER.get_or_init(|| HourlyFileLogger::new(config));
+    let logger = LOGGER.get_or_init(|| Logger::new(config));
     log::set_logger(logger)?;
     log::set_max_level(level);
     Ok(())
@@ -87,7 +87,7 @@ pub fn init(config: Config) -> Result<(), SetLoggerError> {
 ///
 /// # Example
 /// ```rust,no_run
-/// logger_rs::shutdown();
+/// imcooder_logger::shutdown();
 /// ```
 pub fn shutdown() {
     if let Some(logger) = LOGGER.get() {
@@ -98,7 +98,7 @@ pub fn shutdown() {
 /// Convenience: build a [`Config`] with sensible defaults and a single call.
 ///
 /// ```rust,no_run
-/// logger_rs::init(logger_rs::config("my-app", "/var/log/my-app")).unwrap();
+/// imcooder_logger::init(imcooder_logger::config("my-app", "/var/log/my-app")).unwrap();
 /// ```
 pub fn config(app_name: impl Into<String>, log_dir: impl Into<std::path::PathBuf>) -> Config {
     Config {
