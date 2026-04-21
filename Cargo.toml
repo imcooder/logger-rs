@@ -1,14 +1,14 @@
 [package]
-name = "logger-rs"
+name = "logger-nx"
 version = "0.1.0"
 edition = "2021"
 description = "A high-performance hourly-rotating file logger implementing the `log` facade, with TTL-based cleanup. Behaviorally equivalent to @imcooder/node-logger."
 license = "MIT"
 keywords = ["logging", "rotate", "hourly", "file", "log"]
 categories = ["development-tools::debugging"]
-repository = "https://github.com/imcooder/logger-rs"
-homepage = "https://github.com/imcooder/logger-rs"
-documentation = "https://docs.rs/logger-rs"
+repository = "https://github.com/imcooder/logger-nx"
+homepage = "https://github.com/imcooder/logger-nx"
+documentation = "https://docs.rs/logger-nx"
 readme = "README.md"
 authors = ["imcooder <imcooder@gmail.com>"]
 

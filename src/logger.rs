@@ -28,7 +28,7 @@ enum Msg {
 ///
 /// # Example
 /// ```rust,no_run
-/// use logger_rs::Config;
+/// use logger_nx::Config;
 /// use log::LevelFilter;
 /// use std::path::PathBuf;
 ///
@@ -108,7 +108,7 @@ impl Logger {
         let app_name_thread = app_name.clone();
 
         thread::Builder::new()
-            .name(format!("logger-rs/{}", app_name))
+            .name(format!("logger-nx/{}", app_name))
             .spawn(move || {
                 writer_thread(rx, &log_dir, &app_name_thread, ttl_hours, shutdown_clone);
             })
@@ -190,7 +190,7 @@ fn rotate(log_dir: &Path, app_name: &str, state: &mut FileState) {
     let _ = fs::rename(&src, &dst);
     match open_active(log_dir, app_name) {
         Ok(new_state) => *state = new_state,
-        Err(e) => eprintln!("[logger-rs] Failed to open new log file: {e}"),
+        Err(e) => eprintln!("[logger-nx] Failed to open new log file: {e}"),
     }
 }
 
@@ -206,7 +206,7 @@ fn writer_thread(
     let mut state = match open_active(log_dir, app_name) {
         Ok(s) => s,
         Err(e) => {
-            eprintln!("[logger-rs] Cannot open log file: {e}");
+            eprintln!("[logger-nx] Cannot open log file: {e}");
             return;
         }
     };
