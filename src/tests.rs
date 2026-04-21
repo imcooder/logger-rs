@@ -62,15 +62,19 @@ fn cleaner_ignores_non_matching_files() {
 }
 
 #[test]
-fn cleaner_respects_app_name() {
+fn cleaner_only_removes_app_log_prefix() {
     let dir = TempDir::new().unwrap();
-    // Belongs to "other-app", should NOT be touched when cleaning "app"
-    let other_app = dir.path().join("other-app.log.2020010100");
-    std::fs::write(&other_app, b"other").unwrap();
+    // File with different prefix should NOT be touched
+    let other = dir.path().join("other.log.2020010100");
+    std::fs::write(&other, b"other").unwrap();
+    // File matching app.log.* should be cleaned
+    let old = dir.path().join("app.log.2020010100");
+    std::fs::write(&old, b"old").unwrap();
 
     crate::cleaner::cleanup(dir.path(), "app", 72);
 
-    assert!(other_app.exists(), "other app's log should not be touched");
+    assert!(!old.exists(),   "app.log.* old file should be removed");
+    assert!(other.exists(),  "other prefix file should not be touched");
 }
 
 // ── integration ───────────────────────────────────────────────────────────────
@@ -99,7 +103,7 @@ fn writes_log_file_on_init() {
     thread::sleep(Duration::from_millis(200));
     logger.shutdown();
 
-    let log_path = log_dir.join("myapp.log");
+    let log_path = log_dir.join("app.log");
     assert!(log_path.exists(), "myapp.log should be created");
     let content = std::fs::read_to_string(&log_path).unwrap();
     assert!(content.contains("integration test message"), "message not in log: {content}");
@@ -130,7 +134,7 @@ fn debug_messages_below_info_not_written() {
     thread::sleep(Duration::from_millis(200));
     logger.shutdown();
 
-    let log_path = log_dir.join("filtertest.log");
+    let log_path = log_dir.join("app.log");
     if log_path.exists() {
         let content = std::fs::read_to_string(&log_path).unwrap();
         assert!(!content.contains("this is a debug message"), "debug msg should be filtered");

@@ -165,16 +165,16 @@ fn current_hour_tag() -> String {
     Local::now().format("%Y%m%d%H").to_string()
 }
 
-fn active_log_path(log_dir: &Path, app_name: &str) -> PathBuf {
-    log_dir.join(format!("{app_name}.log"))
+fn active_log_path(log_dir: &Path) -> PathBuf {
+    log_dir.join("app.log")
 }
 
-fn archive_log_path(log_dir: &Path, app_name: &str, tag: &str) -> PathBuf {
-    log_dir.join(format!("{app_name}.log.{tag}"))
+fn archive_log_path(log_dir: &Path, tag: &str) -> PathBuf {
+    log_dir.join(format!("app.log.{tag}"))
 }
 
-fn open_active(log_dir: &Path, app_name: &str) -> std::io::Result<FileState> {
-    let path = active_log_path(log_dir, app_name);
+fn open_active(log_dir: &Path, _app_name: &str) -> std::io::Result<FileState> {
+    let path = active_log_path(log_dir);
     let file = OpenOptions::new().create(true).append(true).open(&path)?;
     Ok(FileState {
         writer: BufWriter::with_capacity(64 * 1024, file),
@@ -185,8 +185,8 @@ fn open_active(log_dir: &Path, app_name: &str) -> std::io::Result<FileState> {
 fn rotate(log_dir: &Path, app_name: &str, state: &mut FileState) {
     let _ = state.writer.flush();
     let old_tag = state.current_hour_tag.clone();
-    let src = active_log_path(log_dir, app_name);
-    let dst = archive_log_path(log_dir, app_name, &old_tag);
+    let src = active_log_path(log_dir);
+    let dst = archive_log_path(log_dir, &old_tag);
     let _ = fs::rename(&src, &dst);
     match open_active(log_dir, app_name) {
         Ok(new_state) => *state = new_state,

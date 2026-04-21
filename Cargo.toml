@@ -1,6 +1,6 @@
 [package]
 name = "logger-nx"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 description = "A high-performance hourly-rotating file logger implementing the `log` facade, with TTL-based cleanup. Behaviorally equivalent to @imcooder/node-logger."
 license = "MIT"
