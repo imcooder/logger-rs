@@ -1,0 +1,20 @@
+[package]
+name = "hourly-file-logger"
+version = "0.1.0"
+edition = "2021"
+description = "A high-performance hourly-rotating file logger implementing the `log` facade, with TTL-based cleanup. Behaviorally equivalent to @imcooder/node-logger."
+license = "MIT"
+keywords = ["logging", "rotate", "hourly", "file", "log"]
+categories = ["development-tools::debugging"]
+repository = "https://github.com/cooder-ai/hourly-file-logger"
+homepage = "https://github.com/cooder-ai/hourly-file-logger"
+documentation = "https://docs.rs/hourly-file-logger"
+readme = "README.md"
+
+[dependencies]
+log = "0.4"
+chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
+crossbeam-channel = "0.5"
+
+[dev-dependencies]
+tempfile = "3"
