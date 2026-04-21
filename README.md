@@ -1,7 +1,7 @@
-# logger-rs-nx
+# logger-rs
 
-[![Crates.io](https://img.shields.io/crates/v/logger-rs-nx.svg)](https://crates.io/crates/logger-rs-nx)
-[![docs.rs](https://docs.rs/logger-rs-nx/badge.svg)](https://docs.rs/logger-rs-nx)
+[![Crates.io](https://img.shields.io/crates/v/logger-rs.svg)](https://crates.io/crates/logger-rs)
+[![docs.rs](https://docs.rs/logger-rs/badge.svg)](https://docs.rs/logger-rs)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 A high-performance hourly-rotating file logger for Rust, implementing the [`log`](https://crates.io/crates/log) facade.
@@ -28,23 +28,23 @@ Behaviorally equivalent to the Node.js [`@imcooder/node-logger`](https://github.
 
 ```toml
 [dependencies]
-logger-rs-nx = "0.1"
+logger-rs = "0.1"
 log = "0.4"
 ```
 
 ## Quick Start
 
 ```rust
-use logger_rs_nx::{Config, init};
+use logger_rs::{Config, init};
 use log::LevelFilter;
 use std::path::PathBuf;
 
 fn main() {
     // Option 1: convenience constructor
-    logger_rs_nx::init(logger_rs_nx::config("my-app", "/var/log/my-app")).unwrap();
+    logger_rs::init(logger_rs::config("my-app", "/var/log/my-app")).unwrap();
 
     // Option 2: full config
-    logger_rs_nx::init(Config {
+    logger_rs::init(Config {
         app_name: "my-app".to_string(),
         log_dir:  PathBuf::from("/var/log/my-app"),
         ttl_hours: 72,
@@ -57,7 +57,7 @@ fn main() {
     log::error!("Connection failed: {}", "timeout");
 
     // Flush & stop background thread before exit
-    logger_rs_nx::shutdown();
+    logger_rs::shutdown();
 }
 ```
 
@@ -80,7 +80,7 @@ fn main() {
 
 ## Comparison with @imcooder/node-logger
 
-| Feature | `@imcooder/node-logger` | `logger-rs-nx` |
+| Feature | `@imcooder/node-logger` | `logger-rs` |
 |---------|------------------------|-------------|
 | Log format | `[time] [LEVEL] app - msg` | `[time] [LEVEL] app - msg` ✅ |
 | File naming | `app.log.YYYYMMDDHH` | `app.log.YYYYMMDDHH` ✅ |

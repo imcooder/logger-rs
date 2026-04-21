@@ -22,7 +22,7 @@
 //! ## Quick start
 //!
 //! ```rust,no_run
-//! use logger_rs_nx::{Config, init};
+//! use logger_rs::{Config, init};
 //! use log::LevelFilter;
 //! use std::path::PathBuf;
 //!
@@ -39,7 +39,7 @@
 //! log::error!("Connection failed: {}", "timeout");
 //!
 //! // Before process exit:
-//! logger_rs_nx::shutdown();
+//! logger_rs::shutdown();
 //! ```
 
 mod cleaner;
@@ -60,7 +60,7 @@ static LOGGER: OnceLock<Logger> = OnceLock::new();
 ///
 /// # Example
 /// ```rust,no_run
-/// use logger_rs_nx::{Config, init};
+/// use logger_rs::{Config, init};
 /// use log::LevelFilter;
 /// use std::path::PathBuf;
 ///
@@ -87,7 +87,7 @@ pub fn init(config: Config) -> Result<(), SetLoggerError> {
 ///
 /// # Example
 /// ```rust,no_run
-/// logger_rs_nx::shutdown();
+/// logger_rs::shutdown();
 /// ```
 pub fn shutdown() {
     if let Some(logger) = LOGGER.get() {
@@ -98,7 +98,7 @@ pub fn shutdown() {
 /// Convenience: build a [`Config`] with sensible defaults and a single call.
 ///
 /// ```rust,no_run
-/// logger_rs_nx::init(logger_rs_nx::config("my-app", "/var/log/my-app")).unwrap();
+/// logger_rs::init(logger_rs::config("my-app", "/var/log/my-app")).unwrap();
 /// ```
 pub fn config(app_name: impl Into<String>, log_dir: impl Into<std::path::PathBuf>) -> Config {
     Config {
