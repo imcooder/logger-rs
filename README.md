@@ -1,7 +1,7 @@
 # logger-rs
 
-[![Crates.io](https://img.shields.io/crates/v/logger-rs.svg)](https://crates.io/crates/logger-rs)
-[![docs.rs](https://docs.rs/logger-rs/badge.svg)](https://docs.rs/logger-rs)
+[![Crates.io](https://img.shields.io/crates/v/logger-rs.svg)](https://crates.io/crates/imcooder-logger)
+[![docs.rs](https://docs.rs/imcooder-logger/badge.svg)](https://docs.rs/imcooder-logger)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 A high-performance hourly-rotating file logger for Rust, implementing the [`log`](https://crates.io/crates/log) facade.
