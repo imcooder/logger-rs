@@ -1,29 +1,30 @@
 # logger-rs
 
 [![Crates.io](https://img.shields.io/crates/v/logger-rs.svg)](https://crates.io/crates/logger-rs)
-[![Docs.rs](https://docs.rs/logger-rs/badge.svg)](https://docs.rs/logger-rs)
+[![docs.rs](https://docs.rs/logger-rs/badge.svg)](https://docs.rs/logger-rs)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A high-performance, hourly-rotating file logger for Rust that implements the [`log`](https://crates.io/crates/log) facade.
+A high-performance hourly-rotating file logger for Rust, implementing the [`log`](https://crates.io/crates/log) facade.
 
-Inspired by and behaviorally equivalent to the Node.js [`@imcooder/node-logger`](https://www.npmjs.com/package/@imcooder/node-logger) package — same file naming convention, same TTL-based cleanup, same log format.
-
----
+Behaviorally equivalent to the Node.js [`@imcooder/node-logger`](https://github.com/imcooder/node-logger) library — same log format, same file naming convention, same TTL-based cleanup.
 
 ## Features
 
-- 📁 **Hourly rotation** — active log written to `app.log`, rotated to `app.log.YYYYMMDDHH` every hour
-- 🗑️ **Auto TTL cleanup** — files older than N hours (default 72) are deleted automatically
-- ⚡ **Non-blocking I/O** — all file writes happen on a dedicated background thread via a lock-free channel
-- 🔌 **`log` facade** — works with any crate that uses `log::info!`, `log::error!`, etc.
-- 🖥️ **Console mirroring** — optionally echo all log lines to stderr (enabled by default in debug builds)
-- 🦀 **Zero unsafe code**
+- 📁 Writes to `<app_name>.log`, rotates to `<app_name>.log.YYYYMMDDHH` every hour
+- 🧹 Auto-deletes files older than `ttl_hours` (default **72 h**)
+- ⚡ All I/O on a dedicated background thread — **calling threads never block**
+- 🔒 Zero `unsafe` code
+- 🎯 Drop-in with the standard `log` crate — no changes to existing `log::info!` calls
 
----
+## Log Format
 
-## Quick Start
+```
+[2026-04-21 10:28:35.123] [INFO] my-app - Application started
+[2026-04-21 10:28:35.124] [WARN] my-app - Low disk space
+[2026-04-21 10:28:35.125] [ERROR] my-app - Connection failed: timeout
+```
 
-Add to `Cargo.toml`:
+## Installation
 
 ```toml
 [dependencies]
@@ -31,93 +32,64 @@ logger-rs = "0.1"
 log = "0.4"
 ```
 
-Initialize once at startup:
+## Quick Start
 
 ```rust
-use hourly_file_logger::Config;
+use logger_rs::{Config, init};
 use log::LevelFilter;
 use std::path::PathBuf;
 
 fn main() {
-    hourly_file_logger::init(Config {
-        log_dir: PathBuf::from("/var/log/my-app"),
+    // Option 1: convenience constructor
+    logger_rs::init(logger_rs::config("my-app", "/var/log/my-app")).unwrap();
+
+    // Option 2: full config
+    logger_rs::init(Config {
+        app_name: "my-app".to_string(),
+        log_dir:  PathBuf::from("/var/log/my-app"),
         ttl_hours: 72,
-        level: LevelFilter::Info,
-        console: true,
-    }).expect("logger init failed");
+        level:    LevelFilter::Info,
+        console:  false,
+    }).unwrap();
 
-    log::info!("[App] Application started");
-    log::warn!("[App] Something looks off");
-    log::error!("[App] Something went wrong");
+    log::info!("Application started");
+    log::warn!("Low disk space");
+    log::error!("Connection failed: {}", "timeout");
 
-    // Flush and stop the background thread before exit
-    hourly_file_logger::shutdown();
+    // Flush & stop background thread before exit
+    logger_rs::shutdown();
 }
 ```
-
----
-
-## Log Format
-
-```
-[2026-04-21 10:28:35.123] [INFO]  [my_crate::module] message
-[2026-04-21 10:28:35.124] [WARN]  [my_crate::module] something looks off
-[2026-04-21 10:28:35.125] [ERROR] [my_crate::module] something went wrong
-```
-
-Matches the format of `@imcooder/node-logger` for cross-language log consistency.
-
----
-
-## File Rotation & Cleanup
-
-```
-~/.local/share/my-app/logs/
-  app.log               ← current hour (active)
-  app.log.2026042110    ← previous hours (YYYYMMDDHH)
-  app.log.2026042109
-  app.log.2026042108
-  ...                   ← files older than ttl_hours are deleted
-```
-
-Rotation happens automatically when the hour changes. Cleanup runs on startup and after each rotation (and every 30 minutes as a safety net).
-
----
 
 ## Configuration
 
-```rust
-pub struct Config {
-    /// Directory where log files are written. Created automatically if missing.
-    pub log_dir: PathBuf,
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `app_name` | `String` | `"app"` | App / category name. Used in log lines and filenames |
+| `log_dir` | `PathBuf` | system temp | Directory where log files are created |
+| `ttl_hours` | `i64` | `72` | Hours to retain rotated log files |
+| `level` | `LevelFilter` | `Info` | Minimum log level written to file |
+| `console` | `bool` | `true` (debug) / `false` (release) | Also print to stderr |
 
-    /// Delete rotated files older than this many hours. Default: 72.
-    pub ttl_hours: i64,
+## File Naming
 
-    /// Minimum log level recorded. Default: Info.
-    pub level: LevelFilter,
-
-    /// Mirror log lines to stderr. Default: true in debug builds, false in release.
-    pub console: bool,
-}
-```
-
----
+| File | Description |
+|------|-------------|
+| `my-app.log` | Current log file (active) |
+| `my-app.log.2026042110` | Rotated archive for the 10:00–11:00 slot on 2026-04-21 |
 
 ## Comparison with @imcooder/node-logger
 
-| Feature | node-logger (JS) | logger-rs (Rust) |
-|---------|-----------------|--------------------------|
+| Feature | `@imcooder/node-logger` | `logger-rs` |
+|---------|------------------------|-------------|
+| Log format | `[time] [LEVEL] app - msg` | `[time] [LEVEL] app - msg` ✅ |
+| File naming | `app.log.YYYYMMDDHH` | `app.log.YYYYMMDDHH` ✅ |
 | Hourly rotation | ✅ | ✅ |
-| File naming `app.log.YYYYMMDDHH` | ✅ | ✅ |
-| TTL auto-cleanup | ✅ | ✅ |
-| Async / non-blocking writes | ✅ | ✅ |
-| Console mirroring | ✅ | ✅ |
-| Log format | `[time] [LEVEL] cat - msg` | `[time] [LEVEL] [target] msg` |
-| Integration | Custom API | Standard `log` facade |
-
----
+| TTL cleanup | ✅ (72 h default) | ✅ (72 h default) |
+| Async I/O | ✅ (Node streams) | ✅ (background thread + channel) |
+| Console output | ✅ | ✅ |
+| Zero blocking | ✅ | ✅ |
 
 ## License
 
-MIT — same as `@imcooder/node-logger`.
+MIT © [imcooder](mailto:imcooder@gmail.com)

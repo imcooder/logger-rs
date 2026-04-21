@@ -1,22 +1,33 @@
-//! # hourly-file-logger
+//! # logger-rs
 //!
-//! A high-performance hourly-rotating file logger that implements the [`log`]
-//! facade.  Behaviour matches the Node.js `@imcooder/node-logger` library:
+//! A high-performance hourly-rotating file logger for Rust, implementing the
+//! [`log`] facade.  Behaviorally equivalent to the Node.js
+//! [`@imcooder/node-logger`](https://github.com/imcooder/node-logger) library.
 //!
-//! * Active log written to `<log_dir>/app.log`.
-//! * Every hour the active file is renamed to `app.log.YYYYMMDDHH`.
-//! * Files older than `ttl_hours` (default 72) are deleted automatically.
-//! * All I/O is performed on a dedicated background thread via a lock-free
-//!   channel, so calling threads are never blocked.
+//! ## Features
+//!
+//! - Active log written to `<app_name>.log`
+//! - Every hour the active file is renamed to `<app_name>.log.YYYYMMDDHH`
+//! - Files older than `ttl_hours` (default **72 h**) are deleted automatically
+//! - All I/O runs on a dedicated background thread (lock-free channel) —
+//!   calling threads are **never** blocked
+//! - Zero unsafe code
+//!
+//! ## Log format
+//!
+//! ```text
+//! [2026-04-21 10:28:35.123] [INFO] my-app - Application started
+//! ```
 //!
 //! ## Quick start
 //!
 //! ```rust,no_run
-//! use hourly_file_logger::{Config, init};
+//! use logger_rs::{Config, init};
 //! use log::LevelFilter;
 //! use std::path::PathBuf;
 //!
 //! init(Config {
+//!     app_name: "my-app".to_string(),
 //!     log_dir: PathBuf::from("/var/log/my-app"),
 //!     ttl_hours: 72,
 //!     level: LevelFilter::Info,
@@ -24,6 +35,11 @@
 //! }).expect("logger init failed");
 //!
 //! log::info!("Application started");
+//! log::warn!("Low disk space");
+//! log::error!("Connection failed: {}", "timeout");
+//!
+//! // Before process exit:
+//! logger_rs::shutdown();
 //! ```
 
 mod cleaner;
@@ -33,15 +49,29 @@ mod logger;
 pub use logger::{Config, HourlyFileLogger};
 
 use log::SetLoggerError;
-
-// ── Module-level singleton handle for shutdown ────────────────────────────────
-
 use std::sync::OnceLock;
+
 static LOGGER: OnceLock<HourlyFileLogger> = OnceLock::new();
 
-/// Initialise the global logger.  Call once at application startup.
+/// Initialise the global logger.
 ///
-/// Returns `Err` if the global logger has already been set by another crate.
+/// Call **once** at application startup.  Returns `Err` if another logger has
+/// already been registered via the `log` crate.
+///
+/// # Example
+/// ```rust,no_run
+/// use logger_rs::{Config, init};
+/// use log::LevelFilter;
+/// use std::path::PathBuf;
+///
+/// init(Config {
+///     app_name: "my-app".to_string(),
+///     log_dir: PathBuf::from("/tmp/my-app-logs"),
+///     ttl_hours: 72,
+///     level: LevelFilter::Info,
+///     console: false,
+/// }).unwrap();
+/// ```
 pub fn init(config: Config) -> Result<(), SetLoggerError> {
     let level = config.level;
     let logger = LOGGER.get_or_init(|| HourlyFileLogger::new(config));
@@ -52,13 +82,31 @@ pub fn init(config: Config) -> Result<(), SetLoggerError> {
 
 /// Flush pending writes and stop the background I/O thread gracefully.
 ///
-/// Call this before process exit (e.g. in Tauri's `on_drop`).
+/// Waits up to 2 seconds for the writer thread to drain.  Call this before
+/// process exit.
+///
+/// # Example
+/// ```rust,no_run
+/// logger_rs::shutdown();
+/// ```
 pub fn shutdown() {
     if let Some(logger) = LOGGER.get() {
         logger.shutdown();
     }
 }
 
+/// Convenience: build a [`Config`] with sensible defaults and a single call.
+///
+/// ```rust,no_run
+/// logger_rs::init(logger_rs::config("my-app", "/var/log/my-app")).unwrap();
+/// ```
+pub fn config(app_name: impl Into<String>, log_dir: impl Into<std::path::PathBuf>) -> Config {
+    Config {
+        app_name: app_name.into(),
+        log_dir: log_dir.into(),
+        ..Config::default()
+    }
+}
+
 #[cfg(test)]
 mod tests;
-
